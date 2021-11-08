@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:weather_app4/weather_main_page.dart';
 
 class Weather {
   final int? max;
@@ -30,11 +32,14 @@ class Weather {
       this.location});
 }
 
+Position? _currentPosition;
+String? _currentAddress;
+
 String appId = "9233805c2fc2bced2f6ee9e55842ffb4";
 //https://api.openweathermap.org/data/2.5/onecall?lat=$lat&lon=$lon&units=metric&appid=$appId
 //https://raw.githubusercontent.com/dr5hn/countries-states-cities-database/master/cities.json
 
-Future<List?> fetchData(String lat, String lon, String city) async {
+Future<List?> fetchData(double lat, double lon, String city) async {
   var url =
       "https://api.openweathermap.org/data/2.5/onecall?lat=$lat&lon=$lon&units=metric&appid=$appId";
   var response = await http.get(Uri.parse(url));
@@ -79,7 +84,7 @@ Future<List?> fetchData(String lat, String lon, String city) async {
       );
       sevenDay.add(hourly);
     }
-    return [currentTemp, todayWeather,sevenDay];
+    return [currentTemp, todayWeather, sevenDay];
   }
   return [null, null, null];
 }

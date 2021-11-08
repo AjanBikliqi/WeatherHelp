@@ -13,22 +13,21 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:permission_handler/permission_handler.dart';
 
-
-
 List<Weather>? sevenDay;
 List<Weather>? todayWeather;
 Weather? currentTemp;
+Placemark? place;
 
-String lat = "42.6629";
-String lon = "21.1655";
-String city = 'Pristina';
-int woeid = 2487956;
+double lat = _currentPosition!.latitude;
+double lon =  _currentPosition!.longitude;
+String city = _currentAddress.toString();
+//int woeid = 2487956;
 
 Position? _currentPosition;
 String? _currentAddress;
 
-String searchApiUrl = 'https://www.metaweather.com/api/location/search/?query=';
-String locationApiUrl = 'https://www.metaweather.com/api/location/';
+//String searchApiUrl = 'https://www.metaweather.com/api/location/search/?query=';
+//String locationApiUrl = 'https://www.metaweather.com/api/location/';
 
 const Color _textColor = Colors.white;
 
@@ -39,7 +38,7 @@ class WeatherMainPage extends StatefulWidget {
 
 class _WeatherMainPageState extends State<WeatherMainPage> {
   getData() async {
-    fetchData(lat, lon, city).then((value) {
+    fetchData(lat, lon, city.toString()).then((value) {
       currentTemp = value![0];
       todayWeather = value[1];
       sevenDay = value[2];
@@ -51,73 +50,52 @@ class _WeatherMainPageState extends State<WeatherMainPage> {
   @override
   void initState() {
     super.initState();
+    _getCurrentLocation();
+    _currentAddress;
+    _currentAddress;
     getData();
   }
 
-  Future<void> fetchSearch(String input) async {
-    try {
-      var searchResult = await http.get(Uri.parse(searchApiUrl + input));
-      var result = json.decode(searchResult.body)[0];
+  /*initState() {
+    super.initState();
+    fetchLocation();
+    fetchLocationDay();
+  }*/
 
+  //final Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
+
+  Future<void> _getCurrentLocation() async {
+    Geolocator.getCurrentPosition(
+            desiredAccuracy: LocationAccuracy.best,
+            forceAndroidLocationManager: true)
+        .then((Position position) {
       setState(() {
-        city = result["title"];
-        //woeid = result["woeid"];
+        _currentPosition = position;
       });
-    } catch (error) {
-      setState(() {
-        //errorMessage =
-        //"Sorry, we don't have data about this city. Try another one.";
-        //loading = false;
-      });
-    }
-  }
-
-  Future<void> fetchLocation() async {
-    var locationResult =
-        await http.get(Uri.parse(locationApiUrl + woeid.toString()));
-    var result = json.decode(locationResult.body);
-    var consolidated_weather = result["consolidated_weather"];
-    var data = consolidated_weather[0];
-
-    setState(() {
-      var current = data["current"];
-      current:
-      current["temp"]?.round() ?? 0;
-      //weather = data["weather_state_name"].replaceAll(' ', '').toLowerCase();
-      //abbreviation = data["weather_state_abbr"];
-      //loading = false;
+      _getAddressFromLatLng();
+    }).catchError((e) {
+      print(e);
     });
   }
 
-  PageController _pageController = PageController();
-
-  Future<void> _getCurrentLocation() async {
-    try {
-      final position = await Geolocator.getCurrentPosition();
-      _currentPosition = position;
-      setState(() {});
-      _getAddressFromLatLng();
-    } catch (_) {
-      debugPrint("I'm dumb!");
-    }
-  }
-
   Future<void> _getAddressFromLatLng() async {
-    // from latLng to actual location
-
-    List<Placemark> placemarks = await placemarkFromCoordinates(
-        _currentPosition!.latitude, _currentPosition!.longitude);
-
-    Placemark place = placemarks[0];
-    String? placeName = place.locality;
-    //print('Hello: $placeName');
-    fetchSearch(placeName!);
-    fetchLocation();
+    try {
+      List<Placemark> p = await placemarkFromCoordinates(
+          _currentPosition!.latitude, _currentPosition!.longitude);
+      Placemark place = p[0];
+      setState(() {
+        _currentAddress = " ${place.locality}";
+      });
+    } catch (e) {
+      print(e);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    print(_getCurrentLocation());
+    print(_currentPosition!.latitude);
+    print(_currentPosition!.longitude);
+    print(_currentAddress);
     return Scaffold(
         body: Stack(children: [
       Positioned(
@@ -224,7 +202,7 @@ class _WeatherMainPageState extends State<WeatherMainPage> {
                       Padding(
                         padding: const EdgeInsets.only(left: 120, top: 45),
                         child: Center(
-                          child: Text(_getCurrentLocation().toString(),
+                          child: Text(_currentAddress.toString(),
                               style: GoogleFonts.montserrat(
                                   color: _textColor, fontSize: 30)),
                         ),
