@@ -1,18 +1,34 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:weather_icons/weather_icons.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:weather_app4/dataset.dart';
 import 'package:flutter_glow/flutter_glow.dart';
 import 'package:weather_app4/seven_hourly.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:permission_handler/permission_handler.dart';
+
+
 
 List<Weather>? sevenDay;
 List<Weather>? todayWeather;
 Weather? currentTemp;
+
 String lat = "42.6629";
 String lon = "21.1655";
 String city = 'Pristina';
+int woeid = 2487956;
+
+Position? _currentPosition;
+String? _currentAddress;
+
+String searchApiUrl = 'https://www.metaweather.com/api/location/search/?query=';
+String locationApiUrl = 'https://www.metaweather.com/api/location/';
 
 const Color _textColor = Colors.white;
 
@@ -25,8 +41,8 @@ class _WeatherMainPageState extends State<WeatherMainPage> {
   getData() async {
     fetchData(lat, lon, city).then((value) {
       currentTemp = value![0];
-      sevenDay = value[1];
-      todayWeather = value[2];
+      todayWeather = value[1];
+      sevenDay = value[2];
 
       setState(() {});
     });
@@ -38,10 +54,70 @@ class _WeatherMainPageState extends State<WeatherMainPage> {
     getData();
   }
 
+  Future<void> fetchSearch(String input) async {
+    try {
+      var searchResult = await http.get(Uri.parse(searchApiUrl + input));
+      var result = json.decode(searchResult.body)[0];
+
+      setState(() {
+        city = result["title"];
+        //woeid = result["woeid"];
+      });
+    } catch (error) {
+      setState(() {
+        //errorMessage =
+        //"Sorry, we don't have data about this city. Try another one.";
+        //loading = false;
+      });
+    }
+  }
+
+  Future<void> fetchLocation() async {
+    var locationResult =
+        await http.get(Uri.parse(locationApiUrl + woeid.toString()));
+    var result = json.decode(locationResult.body);
+    var consolidated_weather = result["consolidated_weather"];
+    var data = consolidated_weather[0];
+
+    setState(() {
+      var current = data["current"];
+      current:
+      current["temp"]?.round() ?? 0;
+      //weather = data["weather_state_name"].replaceAll(' ', '').toLowerCase();
+      //abbreviation = data["weather_state_abbr"];
+      //loading = false;
+    });
+  }
+
   PageController _pageController = PageController();
+
+  Future<void> _getCurrentLocation() async {
+    try {
+      final position = await Geolocator.getCurrentPosition();
+      _currentPosition = position;
+      setState(() {});
+      _getAddressFromLatLng();
+    } catch (_) {
+      debugPrint("I'm dumb!");
+    }
+  }
+
+  Future<void> _getAddressFromLatLng() async {
+    // from latLng to actual location
+
+    List<Placemark> placemarks = await placemarkFromCoordinates(
+        _currentPosition!.latitude, _currentPosition!.longitude);
+
+    Placemark place = placemarks[0];
+    String? placeName = place.locality;
+    //print('Hello: $placeName');
+    fetchSearch(placeName!);
+    fetchLocation();
+  }
 
   @override
   Widget build(BuildContext context) {
+    print(_getCurrentLocation());
     return Scaffold(
         body: Stack(children: [
       Positioned(
@@ -113,7 +189,7 @@ class _WeatherMainPageState extends State<WeatherMainPage> {
           Padding(
             padding: const EdgeInsets.only(top: 460, left: 84),
             child: Text(
-              '0.56',
+              currentTemp!.humidity.toString(),
               style: TextStyle(color: Colors.white70, fontSize: 21),
             ),
           ),
@@ -125,7 +201,7 @@ class _WeatherMainPageState extends State<WeatherMainPage> {
           Padding(
             padding: const EdgeInsets.only(top: 460, left: 267),
             child: Text(
-              '41%',
+              currentTemp!.chanceRain.toString() + '%',
               style: TextStyle(color: Colors.white70, fontSize: 21),
             ),
           ),
@@ -148,7 +224,7 @@ class _WeatherMainPageState extends State<WeatherMainPage> {
                       Padding(
                         padding: const EdgeInsets.only(left: 120, top: 45),
                         child: Center(
-                          child: Text("Pristina, Kosovo",
+                          child: Text(_getCurrentLocation().toString(),
                               style: GoogleFonts.montserrat(
                                   color: _textColor, fontSize: 30)),
                         ),

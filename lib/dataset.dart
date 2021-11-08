@@ -79,7 +79,7 @@ Future<List?> fetchData(String lat, String lon, String city) async {
       );
       sevenDay.add(hourly);
     }
-    return [sevenDay, todayWeather, currentTemp];
+    return [currentTemp, todayWeather,sevenDay];
   }
   return [null, null, null];
 }
