@@ -4,9 +4,9 @@ import 'package:intl/intl.dart';
 import 'package:weather_icons/weather_icons.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-import 'package:weather_app4/dataset.dart';
+import 'dataset.dart';
 import 'package:flutter_glow/flutter_glow.dart';
-import 'package:weather_app4/seven_hourly.dart';
+import 'seven_hourly.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'dart:convert';
@@ -18,8 +18,8 @@ List<Weather>? todayWeather;
 Weather? currentTemp;
 Placemark? place;
 
-double lat = _currentPosition!.latitude;
-double lon =  _currentPosition!.longitude;
+late double lat;
+late double lon;
 String city = _currentAddress.toString();
 //int woeid = 2487956;
 
@@ -42,7 +42,7 @@ class _WeatherMainPageState extends State<WeatherMainPage> {
       currentTemp = value![0];
       todayWeather = value[1];
       sevenDay = value[2];
-
+      isLoading = false;
       setState(() {});
     });
   }
@@ -50,10 +50,7 @@ class _WeatherMainPageState extends State<WeatherMainPage> {
   @override
   void initState() {
     super.initState();
-    _getCurrentLocation();
-    _currentAddress;
-    _currentAddress;
-    getData();
+    _getCurrentLocation().then((value) => getData());
   }
 
   /*initState() {
@@ -65,17 +62,16 @@ class _WeatherMainPageState extends State<WeatherMainPage> {
   //final Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
 
   Future<void> _getCurrentLocation() async {
-    Geolocator.getCurrentPosition(
+    Position position = await Geolocator.getCurrentPosition(
             desiredAccuracy: LocationAccuracy.best,
             forceAndroidLocationManager: true)
-        .then((Position position) {
+        ;
       setState(() {
         _currentPosition = position;
+        lat = position.latitude;
+        lon = position.longitude;
       });
       _getAddressFromLatLng();
-    }).catchError((e) {
-      print(e);
-    });
   }
 
   Future<void> _getAddressFromLatLng() async {
@@ -91,13 +87,16 @@ class _WeatherMainPageState extends State<WeatherMainPage> {
     }
   }
 
+  bool isLoading = true;
+
   @override
   Widget build(BuildContext context) {
-    print(_currentPosition!.latitude);
-    print(_currentPosition!.longitude);
-    print(_currentAddress);
+    // print(_currentPosition!.latitude);
+    // print(_currentPosition!.longitude);
+    // print(_currentAddress);
     return Scaffold(
-        body: Stack(children: [
+        body: isLoading ? const Center(child: CircularProgressIndicator()):
+        Stack(children: [
       Positioned(
           left: 0,
           top: 0,
