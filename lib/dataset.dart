@@ -64,10 +64,10 @@ Future<List?> fetchData(double lat, double lon, String city) async {
     List<Weather> todayWeather = [];
     int hour = date.hour;
     for (var i = 0; i < 24; i++) {
-      var temp = data['hourly'];
+      var temp = data['hourly'][i];
       var hourly = Weather(
-          current: temp[i]['temp']?.round() ?? 0,
-          image: findIcon(temp[i]["weather"][0]["main"].toString(),false),
+          current: temp['temp']?.round() ?? 0,
+          image: findIcon(temp["weather"][0]["main"].toString(),false),
           //image: 'assets/assets/rainy.png',
           time: '${(hour + i + 1) % 24}:00');
           description: temp['weather'][0]['description'];

@@ -76,7 +76,7 @@ class Hourly extends StatelessWidget {
                     padding: const EdgeInsets.only(left: 5, top: 5),
                     child: Text(
                       hourly[index].time.toString() +
-                      hourly[index].description.toString(),
+                          hourly[index].description.toString(),
                       style: TextStyle(fontSize: 30),
                     ),
                   ),
