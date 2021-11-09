@@ -46,6 +46,7 @@ class HourlyPage extends StatelessWidget {
 
 class Hourly extends StatelessWidget {
   List<Weather> hourly;
+  List<Weather>? todayWeather;
 
   Hourly(this.hourly);
 
@@ -74,7 +75,8 @@ class Hourly extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.only(left: 5, top: 5),
                     child: Text(
-                      hourly[index].time.toString(),
+                      hourly[index].time.toString() +
+                      hourly[index].description.toString(),
                       style: TextStyle(fontSize: 30),
                     ),
                   ),
@@ -87,11 +89,8 @@ class Hourly extends StatelessWidget {
                           style: TextStyle(fontSize: 30),
                         ),
                       ),
-                      //SizedBox(
-                      // width: 50,
-                      //),
                     ],
-                  )
+                  ),
                 ],
               ),
             ),
@@ -116,6 +115,8 @@ class SevenDays extends StatelessWidget {
   List<Weather> sevenDay;
 
   SevenDays(this.sevenDay);
+
+  String? _currentAddress;
 
   @override
   Widget build(BuildContext context) {
@@ -176,7 +177,7 @@ class SevenDays extends StatelessWidget {
                         width: 80,
                       ),
                     ],
-                  )
+                  ),
                 ],
               ),
             ),

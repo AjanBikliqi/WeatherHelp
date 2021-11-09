@@ -17,6 +17,7 @@ class Weather {
   final String? image;
   final String? time;
   final String? location;
+  final String? description;
 
   Weather(
       {this.max,
@@ -29,7 +30,8 @@ class Weather {
       this.image,
       this.current,
       this.time,
-      this.location});
+      this.location,
+      this.description});
 }
 
 Position? _currentPosition;
@@ -54,6 +56,7 @@ Future<List?> fetchData(double lat, double lon, String city) async {
         day: DateFormat("EEEE dd MMMM").format(date),
         wind: current["wind_speed"]?.round() ?? 0,
         humidity: current["humidity"]?.round() ?? 0,
+        description: current['weather'][0]['description'],
         chanceRain: current["uvi"]?.round() ?? 0,
         location: city,
         image: findIcon(current["weather"][0]["main"].toString(), true));
@@ -64,8 +67,10 @@ Future<List?> fetchData(double lat, double lon, String city) async {
       var temp = data['hourly'];
       var hourly = Weather(
           current: temp[i]['temp']?.round() ?? 0,
-          image: 'assets/assets/rainy.png',
+          image: findIcon(temp[i]["weather"][0]["main"].toString(),false),
+          //image: 'assets/assets/rainy.png',
           time: '${(hour + i + 1) % 24}:00');
+          description: temp['weather'][0]['description'];
       todayWeather.add(hourly);
     }
 
@@ -78,7 +83,9 @@ Future<List?> fetchData(double lat, double lon, String city) async {
       var hourly = Weather(
         max: temp['temp']['max']?.round() ?? 0,
         min: temp['temp']['min']?.round() ?? 0,
-        image: 'assets/assets/rainy.png',
+        image:findIcon(temp["weather"][0]["main"].toString(), false),
+        //description: temp['weather'][0]['description'],
+        //image: 'assets/assets/rainy.png',
         name: temp['weather'][0]['main'].toString(),
         day: day,
       );

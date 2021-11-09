@@ -4,9 +4,9 @@ import 'package:intl/intl.dart';
 import 'package:weather_icons/weather_icons.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-import 'package:weather_app4/dataset.dart';
+import 'dataset.dart';
 import 'package:flutter_glow/flutter_glow.dart';
-import 'package:weather_app4/seven_hourly.dart';
+import 'seven_hourly.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'dart:convert';
@@ -18,8 +18,8 @@ List<Weather>? todayWeather;
 Weather? currentTemp;
 Placemark? place;
 
-double lat = _currentPosition!.latitude;
-double lon =  _currentPosition!.longitude;
+late double lat;
+late double lon;
 String city = _currentAddress.toString();
 //int woeid = 2487956;
 
@@ -42,7 +42,7 @@ class _WeatherMainPageState extends State<WeatherMainPage> {
       currentTemp = value![0];
       todayWeather = value[1];
       sevenDay = value[2];
-
+      isLoading = false;
       setState(() {});
     });
   }
@@ -50,10 +50,7 @@ class _WeatherMainPageState extends State<WeatherMainPage> {
   @override
   void initState() {
     super.initState();
-    _getCurrentLocation();
-    _currentAddress;
-    _currentAddress;
-    getData();
+    _getCurrentLocation().then((value) => getData());
   }
 
   /*initState() {
@@ -65,17 +62,15 @@ class _WeatherMainPageState extends State<WeatherMainPage> {
   //final Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
 
   Future<void> _getCurrentLocation() async {
-    Geolocator.getCurrentPosition(
-            desiredAccuracy: LocationAccuracy.best,
-            forceAndroidLocationManager: true)
-        .then((Position position) {
-      setState(() {
-        _currentPosition = position;
-      });
-      _getAddressFromLatLng();
-    }).catchError((e) {
-      print(e);
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.best,
+        forceAndroidLocationManager: true);
+    setState(() {
+      _currentPosition = position;
+      lat = position.latitude;
+      lon = position.longitude;
     });
+    _getAddressFromLatLng();
   }
 
   Future<void> _getAddressFromLatLng() async {
@@ -84,160 +79,179 @@ class _WeatherMainPageState extends State<WeatherMainPage> {
           _currentPosition!.latitude, _currentPosition!.longitude);
       Placemark place = p[0];
       setState(() {
-        _currentAddress = " ${place.locality}";
+        _currentAddress = "${place.locality}";
       });
     } catch (e) {
       print(e);
     }
   }
 
+  bool isLoading = true;
+
   @override
   Widget build(BuildContext context) {
-    print(_currentPosition!.latitude);
-    print(_currentPosition!.longitude);
-    print(_currentAddress);
+    // print(_currentPosition!.latitude);
+    // print(_currentPosition!.longitude);
+    // print(_currentAddress);
     return Scaffold(
-        body: Stack(children: [
-      Positioned(
-          left: 0,
-          top: 0,
-          bottom: 0,
-          right: 0,
-          child: Container(
-            decoration: BoxDecoration(
-                gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [Colors.amber.shade300, Colors.orange])),
-            child: Center(
-              child: Padding(
-                padding: const EdgeInsets.only(left: 35),
-                child: currentTemp == null
-                    ? const CircularProgressIndicator()
-                    : Text(
-                        currentTemp!.current.toString() + '°',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                            fontSize: 160,
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold),
-                      ),
-              ),
-            ),
-          )),
-      Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(67.0),
-            child: Icon(
-              WeatherIcons.day_cloudy,
-              color: Colors.white,
-              size: 34,
-            ),
-          ),
-        ],
-      ),
-      Column(
-        children: [
-          SizedBox(height: 10),
-          Padding(
-            padding: const EdgeInsets.only(top: 430, left: 65),
-            child: Text(
-              'Humidity',
-              style: TextStyle(color: Colors.white54, fontSize: 20),
-            ),
-          ),
-        ],
-      ),
-      Column(
-        children: [
-          SizedBox(height: 10),
-          Padding(
-            padding: const EdgeInsets.only(top: 430, left: 240),
-            child: Text(
-              'Rain/Snow',
-              style: TextStyle(color: Colors.white54, fontSize: 20),
-            ),
-          ),
-        ],
-      ),
-      Column(
-        children: [
-          SizedBox(height: 10),
-          Padding(
-            padding: const EdgeInsets.only(top: 460, left: 84),
-            child: Text(
-              currentTemp!.humidity.toString(),
-              style: TextStyle(color: Colors.white70, fontSize: 21),
-            ),
-          ),
-        ],
-      ),
-      Column(
-        children: [
-          SizedBox(height: 10),
-          Padding(
-            padding: const EdgeInsets.only(top: 460, left: 267),
-            child: Text(
-              currentTemp!.chanceRain.toString() + '%',
-              style: TextStyle(color: Colors.white70, fontSize: 21),
-            ),
-          ),
-        ],
-      ),
-      Positioned(
-          left: 0,
-          right: 0,
-          bottom: 0,
-          top: 0,
-          child: SafeArea(
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      SizedBox(
-                        width: 8,
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 120, top: 45),
-                        child: Center(
-                          child: Text(_currentAddress.toString(),
-                              style: GoogleFonts.montserrat(
-                                  color: _textColor, fontSize: 30)),
+        body: isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : Stack(children: [
+                Positioned(
+                    left: 0,
+                    top: 0,
+                    bottom: 0,
+                    right: 0,
+                    child: Container(
+                      decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [Colors.amber.shade300, Colors.orange])),
+                      child: Center(
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 35),
+                          child: currentTemp == null
+                              ? const CircularProgressIndicator()
+                              : Text(
+                                  currentTemp!.current.toString() + '\u00B0',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      fontSize: 160,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold),
+                                ),
                         ),
                       ),
-                    ],
-                  ),
-                  Container(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        SingleChildScrollView(
-                          child: Column(
-                            children: [
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [],
-                              ),
-                              /*Text(
+                    )),
+                Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(67.0),
+                      child: Icon(
+                        WeatherIcons.night_alt_cloudy,
+                        color: Colors.white,
+                        size: 34,
+                      ),
+                    ),
+                  ],
+                ),
+                Column(
+                  children: [
+                    SizedBox(height: 10),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 430, left: 65),
+                      child: Text(
+                        'Humidity',
+                        style: TextStyle(color: Colors.white54, fontSize: 20),
+                      ),
+                    ),
+                  ],
+                ),
+                Column(
+                  children: [
+                    SizedBox(height: 10),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 430, left: 240),
+                      child: Text(
+                        'Rain/Snow',
+                        style: TextStyle(color: Colors.white54, fontSize: 20),
+                      ),
+                    ),
+                  ],
+                ),
+                Column(
+                  children: [
+                    SizedBox(height: 10),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 460, left: 84),
+                      child: Text(
+                        currentTemp!.humidity.toString(),
+                        style: TextStyle(color: Colors.white70, fontSize: 21),
+                      ),
+                    ),
+                  ],
+                ),
+                Column(
+                  children: [
+                    SizedBox(height: 10),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 460, left: 267),
+                      child: Text(
+                        currentTemp!.chanceRain.toString() + '%',
+                        style: TextStyle(color: Colors.white70, fontSize: 21),
+                      ),
+                    ),
+                  ],
+                ),
+                Column(
+                  children: [
+                    SizedBox(height: 10),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 540, left: 125),
+                      child: Text(
+                        currentTemp!.description.toString(),
+                        style: TextStyle(color: Colors.white, fontSize: 21),
+                      ),
+                    ),
+                  ],
+                ),
+                Positioned(
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    top: 0,
+                    child: SafeArea(
+                      child: SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            Row(
+                              children: [
+                                SizedBox(
+                                  width: 8,
+                                ),
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.only(left: 120, top: 45),
+                                  child: Center(
+                                    child: Text(_currentAddress.toString(),
+                                        style: GoogleFonts.montserrat(
+                                            color: _textColor, fontSize: 30)),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Container(
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  SingleChildScrollView(
+                                    child: Column(
+                                      children: [
+                                        Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [],
+                                        ),
+                                        /*Text(
                                   "Feels like 24",
                                   style: GoogleFonts.montserrat(
                                     fontSize: 14,
                                     color: Colors.white,
                                   ),
                                 )*/
-                            ],
-                          ),
-                        ),
-                        /*VerticalDivider(
+                                      ],
+                                    ),
+                                  ),
+                                  /*VerticalDivider(
                             color: Colors.white,
                           ),*/
-                      ],
-                    ),
-                  ),
+                                ],
+                              ),
+                            ),
 
-                  /*Divider(
+                            /*Divider(
                     color: Colors.white,
                   ),
                   Row(
@@ -256,7 +270,7 @@ class _WeatherMainPageState extends State<WeatherMainPage> {
                       )))
                     ],
                   ),*/
-                  /*Padding(
+                            /*Padding(
                     padding: const EdgeInsets.all(30.0),
                     child: SmoothPageIndicator(
                       controller: _pageController,
@@ -269,51 +283,59 @@ class _WeatherMainPageState extends State<WeatherMainPage> {
                           activeDotColor: Colors.white),
                     ),
                   ),*/
-                ],
-              ),
-            ),
-          )),
-      Align(
-        alignment: Alignment.bottomLeft,
-        child: SizedBox(
-          height: 50,
-          width: 100,
-          child: RaisedButton(
-            onPressed: () {
-              Navigator.push(context, MaterialPageRoute(
-                builder: (BuildContext context) {
-                  return HourlyPage(todayWeather!);
-                },
-              ));
-            },
-            child: const Text('Hourly', style: TextStyle(fontSize: 20)),
-            color: Colors.orange.shade200,
-            textColor: Colors.white,
-            elevation: 5,
-          ),
-        ),
-      ),
-      Align(
-        alignment: Alignment.bottomRight,
-        child: SizedBox(
-          height: 50,
-          width: 100,
-          child: RaisedButton(
-            onPressed: () {
-              Navigator.push(context, MaterialPageRoute(
-                builder: (BuildContext context) {
-                  return DetailPage(sevenDay!);
-                },
-              ));
-            },
-            child: const Text('7 days', style: TextStyle(fontSize: 20)),
-            color: Colors.orange.shade200,
-            textColor: Colors.white,
-            elevation: 5,
-          ),
-        ),
-      ),
-    ]));
+                          ],
+                        ),
+                      ),
+                    )),
+                Align(
+                  alignment: Alignment.bottomLeft,
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 68),
+                    child: SizedBox(
+                      height: 50,
+                      width: 135,
+                      child: RaisedButton(
+                        onPressed: () {
+                          Navigator.push(context, MaterialPageRoute(
+                            builder: (BuildContext context) {
+                              return HourlyPage(todayWeather!);
+                            },
+                          ));
+                        },
+                        child:
+                            const Text('Hourly', style: TextStyle(fontSize: 20)),
+                        color: Colors.orange.shade200,
+                        textColor: Colors.white,
+                        elevation: 5,
+                      ),
+                    ),
+                  ),
+                ),
+                Align(
+                  alignment: Alignment.bottomRight,
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 68),
+                    child: SizedBox(
+                      height: 50,
+                      width: 135,
+                      child: RaisedButton(
+                        onPressed: () {
+                          Navigator.push(context, MaterialPageRoute(
+                            builder: (BuildContext context) {
+                              return DetailPage(sevenDay!);
+                            },
+                          ));
+                        },
+                        child:
+                            const Text('7 days', style: TextStyle(fontSize: 20)),
+                        color: Colors.orange.shade200,
+                        textColor: Colors.white,
+                        elevation: 5,
+                      ),
+                    ),
+                  ),
+                ),
+              ]));
   }
 }
 
