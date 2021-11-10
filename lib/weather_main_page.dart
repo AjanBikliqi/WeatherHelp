@@ -73,6 +73,12 @@ class _WeatherMainPageState extends State<WeatherMainPage> {
     _getAddressFromLatLng();
   }
 
+  void updateUi() {
+    setState(() {
+      _getCurrentLocation().then((value) => getData());
+    });
+  }
+
   Future<void> _getAddressFromLatLng() async {
     try {
       List<Placemark> p = await placemarkFromCoordinates(
@@ -90,9 +96,6 @@ class _WeatherMainPageState extends State<WeatherMainPage> {
 
   @override
   Widget build(BuildContext context) {
-    // print(_currentPosition!.latitude);
-    // print(_currentPosition!.longitude);
-    // print(_currentAddress);
     return Scaffold(
         body: isLoading
             ? const Center(child: CircularProgressIndicator())
@@ -127,11 +130,14 @@ class _WeatherMainPageState extends State<WeatherMainPage> {
                 Column(
                   children: [
                     Padding(
-                      padding: const EdgeInsets.all(67.0),
-                      child: Icon(
-                        WeatherIcons.night_alt_cloudy,
-                        color: Colors.white,
-                        size: 34,
+                      padding: const EdgeInsets.only(top: 110, right: 220),
+                      child: Align(
+                        alignment: Alignment.topCenter,
+                        child: Icon(
+                          WeatherIcons.night_alt_cloudy,
+                          color: Colors.white,
+                          size: 34,
+                        ),
                       ),
                     ),
                   ],
@@ -212,8 +218,8 @@ class _WeatherMainPageState extends State<WeatherMainPage> {
                                 ),
                                 Padding(
                                   padding:
-                                      const EdgeInsets.only(left: 135, top: 45),
-                                  child: Align(
+                                      const EdgeInsets.only(left: 135, top:90),
+                                   child: Align(
                                     alignment: Alignment.topCenter,
                                     child: Text(_currentAddress.toString(),
                                         style: GoogleFonts.montserrat(
@@ -332,6 +338,24 @@ class _WeatherMainPageState extends State<WeatherMainPage> {
                         color: Colors.orange.shade200,
                         textColor: Colors.white,
                         elevation: 5,
+                      ),
+                    ),
+                  ),
+                ),
+                Align(
+                  alignment: Alignment.bottomRight,
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 135, bottom: 600),
+                    child: SizedBox(
+                      height: 50,
+                      width: 135,
+                      child: IconButton(
+                        icon: new Image.asset(
+                          'assets/refreshButton.png',
+                        ),
+                        onPressed: () {
+                          updateUi();
+                        },
                       ),
                     ),
                   ),

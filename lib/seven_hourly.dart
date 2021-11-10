@@ -15,7 +15,7 @@ class DetailPage extends StatelessWidget {
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         toolbarHeight: 70,
-        backgroundColor: Colors.transparent, 
+        backgroundColor: Colors.transparent,
         elevation: 0,
         title: Align(
           alignment: Alignment.topCenter,
@@ -39,7 +39,7 @@ class HourlyPage extends StatelessWidget {
 
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBodyBehindAppBar: true,
+      //extendBodyBehindAppBar: true, 
       appBar: AppBar(
         toolbarHeight: 70,
         backgroundColor: Colors.transparent,
@@ -52,7 +52,7 @@ class HourlyPage extends StatelessWidget {
           ),
         ),
       ),
-      backgroundColor: Color(0xff030317),
+      backgroundColor: Colors.amber.shade300,
       body: Column(
         children: [Hourly(hourly)],
       ),
