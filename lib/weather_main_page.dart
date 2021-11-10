@@ -212,8 +212,9 @@ class _WeatherMainPageState extends State<WeatherMainPage> {
                                 ),
                                 Padding(
                                   padding:
-                                      const EdgeInsets.only(left: 120, top: 45),
-                                  child: Center(
+                                      const EdgeInsets.only(left: 135, top: 45),
+                                  child: Align(
+                                    alignment: Alignment.topCenter,
                                     child: Text(_currentAddress.toString(),
                                         style: GoogleFonts.montserrat(
                                             color: _textColor, fontSize: 30)),
@@ -302,8 +303,8 @@ class _WeatherMainPageState extends State<WeatherMainPage> {
                             },
                           ));
                         },
-                        child:
-                            const Text('Hourly', style: TextStyle(fontSize: 20)),
+                        child: const Text('Hourly',
+                            style: TextStyle(fontSize: 20)),
                         color: Colors.orange.shade200,
                         textColor: Colors.white,
                         elevation: 5,
@@ -326,8 +327,8 @@ class _WeatherMainPageState extends State<WeatherMainPage> {
                             },
                           ));
                         },
-                        child:
-                            const Text('7 days', style: TextStyle(fontSize: 20)),
+                        child: const Text('7 days',
+                            style: TextStyle(fontSize: 20)),
                         color: Colors.orange.shade200,
                         textColor: Colors.white,
                         elevation: 5,

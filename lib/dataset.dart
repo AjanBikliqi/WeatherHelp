@@ -67,10 +67,10 @@ Future<List?> fetchData(double lat, double lon, String city) async {
       var temp = data['hourly'][i];
       var hourly = Weather(
           current: temp['temp']?.round() ?? 0,
-          image: findIcon(temp["weather"][0]["main"].toString(),false),
+          image: findIcon(temp["weather"][0]["main"].toString(), false),
           //image: 'assets/assets/rainy.png',
-          time: '${(hour + i + 1) % 24}:00');
-          description: temp['weather'][0]['description'];
+          time: '${(hour + i + 1) % 24}:00',
+          description: temp['weather'][0]['description']);
       todayWeather.add(hourly);
     }
 
@@ -83,7 +83,7 @@ Future<List?> fetchData(double lat, double lon, String city) async {
       var hourly = Weather(
         max: temp['temp']['max']?.round() ?? 0,
         min: temp['temp']['min']?.round() ?? 0,
-        image:findIcon(temp["weather"][0]["main"].toString(), false),
+        image: findIcon(temp["weather"][0]["main"].toString(), false),
         //description: temp['weather'][0]['description'],
         //image: 'assets/assets/rainy.png',
         name: temp['weather'][0]['main'].toString(),

@@ -15,11 +15,14 @@ class DetailPage extends StatelessWidget {
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         toolbarHeight: 70,
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.transparent, 
         elevation: 0,
-        title: Text(
-          "  This week's weather",
-          style: TextStyle(fontSize: 25),
+        title: Align(
+          alignment: Alignment.topCenter,
+          child: Text(
+            "This week's weather",
+            style: TextStyle(fontSize: 25),
+          ),
         ),
       ),
       body: Column(
@@ -36,6 +39,19 @@ class HourlyPage extends StatelessWidget {
 
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        toolbarHeight: 70,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        title: Align(
+          alignment: Alignment.topCenter,
+          child: Text(
+            "24h Weather",
+            style: TextStyle(fontSize: 25),
+          ),
+        ),
+      ),
       backgroundColor: Color(0xff030317),
       body: Column(
         children: [Hourly(hourly)],
@@ -75,18 +91,40 @@ class Hourly extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.only(left: 5, top: 5),
                     child: Text(
-                      hourly[index].time.toString() +
-                          hourly[index].description.toString(),
-                      style: TextStyle(fontSize: 30),
+                      hourly[index].time.toString(),
+                      style: TextStyle(
+                          fontSize: 30,
+                          color: Colors.white70,
+                          fontWeight: FontWeight.w600),
                     ),
                   ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 40, top: 5),
+                    child: Text(
+                      hourly[index].description.toString(),
+                      style: TextStyle(fontSize: 20, color: Colors.white70),
+                    ),
+                  ),
+
+                  /*child: RichText(
+                      text: TextSpan(
+                          style: DefaultTextStyle.of(context).style,
+                          children: <TextSpan>[
+                            TextSpan(text: hourly[index].time.toString(),
+                            style: TextStyle(fontSize: 30, color: Colors.white70)),
+                            TextSpan(text: hourly[index].description.toString())
+                          ]),
+                    ),*/
                   Row(
                     children: [
                       Padding(
-                        padding: const EdgeInsets.only(right: 5),
+                        padding: const EdgeInsets.only(left: 20),
                         child: Text(
                           hourly[index].current.toString() + '\u00B0',
-                          style: TextStyle(fontSize: 30),
+                          style: TextStyle(
+                              fontSize: 30,
+                              color: Colors.white70,
+                              fontWeight: FontWeight.w600),
                         ),
                       ),
                     ],
@@ -160,7 +198,10 @@ class SevenDays extends StatelessWidget {
                             alignment: Alignment.center,
                             child: Text(
                               sevenDay[index].max.toString() + '\u00B0',
-                              style: TextStyle(fontSize: 20),
+                              style: TextStyle(
+                                fontSize: 20,
+                                color: Colors.orange,
+                              ),
                             ),
                           ),
                         ),
@@ -171,7 +212,10 @@ class SevenDays extends StatelessWidget {
                     children: [
                       Text(
                         sevenDay[index].day.toString(),
-                        style: TextStyle(fontSize: 20),
+                        style: TextStyle(
+                          fontSize: 20,
+                          color: Colors.white,
+                        ),
                       ),
                       SizedBox(
                         width: 80,
