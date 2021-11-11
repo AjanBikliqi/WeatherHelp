@@ -194,10 +194,12 @@ class _WeatherMainPageState extends State<WeatherMainPage> {
                   children: [
                     SizedBox(height: 10),
                     Padding(
-                      padding: const EdgeInsets.only(top: 540, left: 125),
-                      child: Text(
-                        currentTemp!.description.toString(),
-                        style: TextStyle(color: Colors.white, fontSize: 21),
+                      padding: const EdgeInsets.only(top: 520),
+                       child: Center(
+                        child: Text(
+                          currentTemp!.description.toString(),
+                          style: TextStyle(color: Colors.white, fontSize: 21),
+                        )
                       ),
                     ),
                   ],

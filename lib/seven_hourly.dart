@@ -19,9 +19,12 @@ class DetailPage extends StatelessWidget {
         elevation: 0,
         title: Align(
           alignment: Alignment.topCenter,
-          child: Text(
-            "This week's weather",
-            style: TextStyle(fontSize: 25),
+          child: Padding(
+            padding: const EdgeInsets.only(right: 60),
+            child: Text(
+              "This week's weather",
+              style: TextStyle(fontSize: 25),
+            ),
           ),
         ),
       ),
@@ -39,7 +42,7 @@ class HourlyPage extends StatelessWidget {
 
   Widget build(BuildContext context) {
     return Scaffold(
-      //extendBodyBehindAppBar: true, 
+      //extendBodyBehindAppBar: true,
       appBar: AppBar(
         toolbarHeight: 70,
         backgroundColor: Colors.transparent,
@@ -68,6 +71,7 @@ class Hourly extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    //print(hourly.image);
     return Expanded(
         child: Container(
       decoration: BoxDecoration(
@@ -81,7 +85,7 @@ class Hourly extends StatelessWidget {
           return Align(
             child: Padding(
               padding: EdgeInsets.only(
-                left: 20,
+                left: 10,
                 right: 50,
                 bottom: 20,
               ),
@@ -98,8 +102,9 @@ class Hourly extends StatelessWidget {
                           fontWeight: FontWeight.w600),
                     ),
                   ),
+                  Image.network(hourly[index].image),
                   Padding(
-                    padding: const EdgeInsets.only(left: 40, top: 5),
+                    padding: const EdgeInsets.only(left: 13, top: 5),
                     child: Text(
                       hourly[index].description.toString(),
                       style: TextStyle(fontSize: 20, color: Colors.white70),
@@ -210,6 +215,15 @@ class SevenDays extends StatelessWidget {
                   ),
                   Row(
                     children: [
+                      Image.asset(
+                        sevenDay[index].image.toString(),
+                        width: 40,
+                        height: 40,
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
                       Text(
                         sevenDay[index].day.toString(),
                         style: TextStyle(
@@ -233,11 +247,11 @@ class SevenDays extends StatelessWidget {
 }
 
 //Text(
-                      //'+' + sevenDay[index].min.toString() + '\u00B0',
-                      //style: TextStyle(fontSize: 20, color: Colors.grey),
-                      //),
+//'+' + sevenDay[index].min.toString() + '\u00B0',
+//style: TextStyle(fontSize: 20, color: Colors.grey),
+//),
 
-                      /*SingleChildScrollView(
+/*SingleChildScrollView(
                     child: Container(
                       width: 135,
                       child: Row(

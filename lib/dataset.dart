@@ -14,7 +14,7 @@ class Weather {
   final int? wind;
   final int? humidity;
   final int? chanceRain;
-  final String? image;
+  final String image;
   final String? time;
   final String? location;
   final String? description;
@@ -27,7 +27,7 @@ class Weather {
       this.wind,
       this.humidity,
       this.chanceRain,
-      this.image,
+      required this.image,
       this.current,
       this.time,
       this.location,
@@ -59,7 +59,9 @@ Future<List?> fetchData(double lat, double lon, String city) async {
         description: current['weather'][0]['description'],
         chanceRain: current["uvi"]?.round() ?? 0,
         location: city,
-        image: findIcon(current["weather"][0]["main"].toString(), true));
+        image: "http://openweathermap.org/img/w/" +
+              current["weather"]["icon"] +
+              ".png",);
 
     List<Weather> todayWeather = [];
     int hour = date.hour;
@@ -67,7 +69,11 @@ Future<List?> fetchData(double lat, double lon, String city) async {
       var temp = data['hourly'][i];
       var hourly = Weather(
           current: temp['temp']?.round() ?? 0,
-          image: findIcon(temp["weather"][0]["main"].toString(), false),
+          image: "http://openweathermap.org/img/w/" +
+              temp["weather"]["icon"] +
+              ".png",
+
+          //image: findIcon(temp["weather"][0]["main"].toString(), false),
           //image: 'assets/assets/rainy.png',
           time: '${(hour + i + 1) % 24}:00',
           description: temp['weather'][0]['description']);
@@ -83,7 +89,11 @@ Future<List?> fetchData(double lat, double lon, String city) async {
       var hourly = Weather(
         max: temp['temp']['max']?.round() ?? 0,
         min: temp['temp']['min']?.round() ?? 0,
-        image: findIcon(temp["weather"][0]["main"].toString(), false),
+        image: "http://openweathermap.org/img/w/" +
+            temp["weather"]["icon"] +
+            ".png",
+
+        //image: findIcon(temp["weather"][0]["main"].toString(), false),
         //description: temp['weather'][0]['description'],
         //image: 'assets/assets/rainy.png',
         name: temp['weather'][0]['main'].toString(),
